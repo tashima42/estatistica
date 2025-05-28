@@ -1,0 +1,32 @@
+---
+title: "atividade_1"
+output: html_document
+---
+```{r}
+qualidade_sono <- qualidade_sono %>%
+  dplyr::mutate(sleep_disorder_adj = factor(Sleep.Disorder),
+                occupation_adj = factor(Occupation))
+```
+
+```{r}
+plot(
+  x = qualidade_sono$Sleep.Duration, 
+  y = qualidade_sono$Quality.of.Sleep,
+  xlab = "Duracao do sono",
+  ylab = "Qualidade do sono",
+  main = "Gráfico de dispersão Duracao e Qualidade do sono")
+```
+
+Correlação entre duracao e qualidade do sono: `r round(cor(x = qualidade_sono$Sleep.Duration, y = qualidade_sono$Quality.of.Sleep, method = "spearman"), 1)`
+
+
+```{r}
+boxplot(qualidade_sono$Physical.Activity.Level ~ qualidade_sono$sleep_disorder_adj,
+        col = "lightblue",
+        border = "gray",
+        xlab = "Desordem  de sono",
+        ylab = "Nivel de atividade fisica",
+        main = "Boxplot desordem de sono do sono por nivel de atividade fisica")
+```
+
+
