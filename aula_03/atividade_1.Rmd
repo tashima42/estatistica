@@ -2,10 +2,67 @@
 title: "atividade_1"
 output: html_document
 ---
+
+## Preparação dos dados
 ```{r}
-qualidade_sono <- qualidade_sono %>%
-  dplyr::mutate(sleep_disorder_adj = factor(Sleep.Disorder),
-                occupation_adj = factor(Occupation))
+# setup
+project_root_path <- getwd()
+source(paste0(project_root_path, "/definitions.R"))
+source(paste0(project_root_path, "/install_load_packages.R"), encoding = encoding)
+
+qualidade_sono <- read.csv(paste0(project_root_path, "/qualidade_sono.csv"), header = TRUE)
+data <- qualidade_sono
+head(data)
+str(data)
+```
+
+## Alterações variáveis
+```{r}
+data <- data |> 
+  dplyr::mutate(
+    gender = factor(Gender),
+    occupation = factor(Occupation),
+    bmi = factor(BMI.Category),
+    sleep_disorder = factor(Sleep.Disorder))
+str(data)
+table(data$bmi)
+table(data$occupation)
+
+# Normal and Normal Weight are the same
+data <- data |>
+  dplyr::mutate(
+    bmi_adj = factor(dplyr::case_when(bmi == 'Normal Weight' ~ 'Normal', TRUE ~ bmi),
+      levels = c('Normal', 'Overweight', 'Obese'), ordered = TRUE),
+    occupation_adj = dplyr::case_when(occupation %in% c('Salesperson', 'Sales Representative') ~ 'Sales',
+                                      occupation %in% c('Scientist', 'Software Engineer', 'Manager') ~ 'Other',
+                                      TRUE ~ occupation),
+    quality_of_sleep = factor(dplyr::case_when(Quality.of.Sleep <= 3 ~ 'Bad',
+                                        Quality.of.Sleep <= 6 ~ 'Medium',
+                                        Quality.of.Sleep <= 9 ~ 'Good',
+                                        TRUE ~ 'Excelent'),
+                          levels = c('Bad', 'Medium', 'Good', 'Excelent', ordered = TRUE)),
+    stress_level = factor(dplyr::case_when(Stress.Level <= 3 ~ 'Low',
+                                           Stress.Level <= 6 ~ 'Medium',
+                                           TRUE ~ 'High'),
+                          levels = c('Low', 'Mediuim', 'High'), ordered = TRUE))
+
+data <- data |>
+  dplyr::select(-c('Gender', 'Occupation',  'Blood.Pressure', 'Sleep.Disorder', 'BMI.Category', 'Stress.Level', 'Quality.of.Sleep', 'occupation', 'bmi'))
+  
+skimr::skim(data)
+
+str(data)
+table(data$occupation_adj)
+table(data$bmi_adj)
+table(data$quality_of_sleep)
+table(data$stress_level)
+summary(data)
+```
+
+## explorando o stress
+```{r}
+table(data$stress_level, data$occupation_adj)
+round(prop.table(table(data$stress_level, data$occupation_adj), margin = 1) * 100,0)
 ```
 
 ```{r}
