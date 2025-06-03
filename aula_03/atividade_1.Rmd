@@ -6,9 +6,9 @@ Aluno: Pedro Tashima
 
 ## Introdução
 
-O sono está intimamente ligado ao bem-estar pscicológico, segundo a Academia Brasileira do Sono (2024), o sono é fundamental para a regulação emocional, a capacidade cognitiva, prevenção de transtornos mentais, resiliência psicológica, dentre outros aspectos da saúde mental.
+O sono está intimamente ligado ao bem-estar psicológico, segundo a Academia Brasileira do Sono (2024), o sono é fundamental para a regulação emocional, a capacidade cognitiva, a prevenção de transtornos mentais, resiliência psicológica, entre outros aspectos da saúde mental.
 
-Este relatório utiliza dados de uma pesquisa realizada pelo setor de recursos humanos (RH) com uma amostra dos colaboradores de uma empresa. Seu objetivo é sugerir mudanças práticas e realistas de comportamento, principalmente ligados ao sono, que promovam a saúde mental dos colaboradores. Para isso, como contexto, serão apresentadas análises dos dados coletados e ao final, recomendações para o setor de RH.
+Este relatório utiliza dados de uma pesquisa realizada pelo setor de recursos humanos (RH) com uma amostra dos colaboradores de uma empresa. Seu objetivo é sugerir mudanças práticas e realistas de comportamento, principalmente ligadas ao sono, que promovam a saúde mental dos colaboradores. Para isso, como contexto, serão apresentadas análises dos dados coletados e, ao final, recomendações para o setor de RH.
 
 ```{r, include=FALSE}
 # setup
@@ -43,9 +43,9 @@ data <- data |>
         Quality.of.Sleep <= 3 ~ "Bad",
         Quality.of.Sleep <= 6 ~ "Medium",
         Quality.of.Sleep <= 9 ~ "Good",
-        TRUE ~ "Excelent"
+        TRUE ~ "Excellent"
       ),
-      levels = c("Bad", "Medium", "Good", "Excelent"), ordered = TRUE
+      levels = c("Bad", "Medium", "Good", "Excellent"), ordered = TRUE
     ),
     stress_level = factor(
       dplyr::case_when(
@@ -96,7 +96,7 @@ A mediana da quantidade de sono dos colaboradores é de `r median(data$Sleep.Dur
 hist(data$Sleep.Duration, breaks = seq(5, 9, by = 0.2),
      main = "Gráfico 2: Histograma da duração do sono",
      xlab = "Duração do sono (h)",
-     ylab = "Frequencia",
+     ylab = "Frequência",
      col="purple")
 
 boxplot(data$Sleep.Duration,
@@ -113,7 +113,7 @@ Dentre os colaboradores analisados, observa-se que uma quantidade preocupante de
 round(prop.table(table(data$gender, data$sleep_disorder), margin = 1)*100,0)
 ```
 
-Colaboradores com distúrbios do sono tem uma mediana de horas de sono, muito menor do que colaboradores sem nenhum distúrbio. Quando distúrbios são comparados, colaboradores com insônia tem uma mediana de sono menor que os com apneia do sono, porém os dois cenários são preocupantes, porque o quartil inferior dos dois distúrbios estão em níveis muito baixos (gráfico 4).
+Colaboradores com distúrbios do sono têm uma mediana de horas de sono, muito menor do que colaboradores sem nenhum distúrbio. Quando distúrbios são comparados, colaboradores com insônia têm uma mediana de sono menor que os com apneia do sono, porém os dois cenários são preocupantes, pois o quartil inferior dos dois distúrbios está em um nível muito baixo (gráfico 4).
 ```{R echo=FALSE}
 boxplot(data$Sleep.Duration ~ data$sleep_disorder,
         col = "lightblue",
@@ -124,13 +124,13 @@ title("Gráfico 4: Boxplot de distúrbios do sono por duração do sono")
 
 ## Recomendações
 
-Com base nas análises realizadas, é recomendado ao setor de recursos humanos realizar ações, principalmente de conscientização, direcionadas aos principais problemas observados, utilizando como principal fonte a cartilha da Academia Brasileira do Sono (2025).
+Com base nas análises realizadas, recomenda-se ao setor de recursos humanos realizar ações, principalmente de conscientização, direcionadas aos principais problemas observados, utilizando como principal fonte a cartilha da Academia Brasileira do Sono (2025).
 
 1. Realizar workshops de respiração e meditação, técnicas que auxiliam o início e manutenção do sono;
 2. Distribuir blocos de notas com instruções para escrever compromissos e preocupações para desacelerar antes de dormir;
 3. Distribuir cartilhas com dicas para higiene do sono;
-4. Realizar parcerias com profissionais da saúde que atendem os principais distúrbios do sono observados entre os colaboradores
-5. Continuar realizando pesquisas e acompanhando o desenvolvimento da saúde mental dos colaboradores
+4. Realizar parcerias com profissionais da saúde que atendem os principais distúrbios do sono observados entre os colaboradores;
+5. Continuar realizando pesquisas e acompanhando o desenvolvimento da saúde mental dos colaboradores.
 
 
 ### Referências
