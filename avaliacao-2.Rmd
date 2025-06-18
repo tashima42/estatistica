@@ -32,7 +32,7 @@ source(paste0(project_root_path, "/install_load_packages.R"), encoding = encodin
 
 ```{r, results='show'}
 # 1. Carregamento dos dados
-dados <- diamonds
+#dados <- diamonds
 str(dados)
 # 2. Tratamento dos dados
 
@@ -106,9 +106,13 @@ sd(dados$price)
 ad.test(dados$price)
 ad.test(dados$carat)
 
+```
+
 ### H0 rejeitada, dados não são normais. Conclusão: Existe uma correlação positiva e significativa entre peso e preço.
 
 # 2. existe diferença no preço do diamante de acordo com o tipo de corte?
+
+```{r}
 
 ## H0: O preço não muda com o corte
 ## H1: O preço muda com o cortes
