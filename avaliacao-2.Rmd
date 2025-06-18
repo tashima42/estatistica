@@ -6,7 +6,6 @@ Ricardo Jonas de Assis"
 date: "2025-06-10"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -28,9 +27,7 @@ source(paste0(project_root_path, "/definitions.R"))
 # Instalando e carregando pacotes 
 ###
 source(paste0(project_root_path, "/install_load_packages.R"), encoding = encoding)
-```
 
-```{r, results='show'}
 # 1. Carregamento dos dados
 dados <- diamonds
 str(dados)
@@ -47,19 +44,38 @@ dados <- dados %>%
 dados <- dados %>%
   dplyr::mutate(color_adj = factor(dados$color_adj))
 
+```
+
+## Análise exploratória dos dados
+
+O conjunto de dados *diamonds* é composto pelo preço, peso, cor, corte e outras informações de 53940 diamantes.
+
+```{r, results='show'}
 head(dados)
 str(dados)
 summary(dados)
+```
 
+
+Diamantes com as cores "D", "E", "F", foram agrupados, como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos. Os dois grupos tem uma proporção, similar, mas o grupo colorido é maior, sendo 51.6% da amostra.
+
+```{r, results='show'}
 table(dados$color_adj)
-round(prop.table(table(diamonds$cut)) * 100, 1)
+round(prop.table(table(dados$color_adj)) * 100, 1)
+barplot(table(dados$color_adj), ylim = c(0,30000), col=c("lightblue", "white"))
+```
 
+
+
+```{r, results='show'}
 # Cor - Quali
 # Corte - Quali
 ## Frequencia absoluta
-barplot(table(dados$color_adj), ylim = c(0,30000), col=c("lightblue", "white"))
 barplot(table(dados$cut), ylim = c(0,30000), col = rainbow(nrow(table(dados$cut))))
+round(prop.table(table(dados$cut)) * 100, 1)
+```
 
+```{r, results='show'}
 ## Frequencia relativa
 # TBD
 
@@ -68,7 +84,9 @@ barplot(table(dados$cut), ylim = c(0,30000), col = rainbow(nrow(table(dados$cut)
 hist(dados$price)
 boxplot(dados$price)
 car::qqPlot(dados$price)
+```
 
+```{r, results='show'}
 #hist(dados$carat)
 boxplot(dados$carat)
 car::qqPlot(dados$carat)
@@ -92,6 +110,10 @@ Cores:
 
 26114 Incolores
 
+## Existe correlação entre o preço e o peso do diamante?
+
+Correlação: `r cor(dados$price, dados$carat, method = "spearman")`
+
 ```{r}
 # 1. existe correlação entre preço e peso do diamante?
 ## H0: Preço não acompanha o peso
@@ -99,7 +121,6 @@ Cores:
 
 ## Alfa = 0.05
 plot(dados$price, dados$carat)
-cor(dados$price, dados$carat, method = "spearman") # Correlação muito forte, p < 0.05
 sd(dados$carat)
 sd(dados$price)
 
