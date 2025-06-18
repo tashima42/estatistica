@@ -57,39 +57,55 @@ summary(dados)
 ```
 
 
-Diamantes com as cores "D", "E", "F", foram agrupados, como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos. Os dois grupos tem uma proporção, similar, mas o grupo colorido é maior, sendo 51.6% da amostra.
+Diamantes com as cores "D", "E", "F", foram agrupados, como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos. Os dois grupos tem uma proporção similar, mas o grupo colorido é maior, sendo 51.6% da amostra.
 
 ```{r, results='show'}
 table(dados$color_adj)
 round(prop.table(table(dados$color_adj)) * 100, 1)
-barplot(table(dados$color_adj), ylim = c(0,30000), col=c("lightblue", "white"))
+barplot(table(dados$color_adj), 
+        ylim = c(0,30000), 
+        col=c("lightblue", "white"),
+        xlab = 'Coloração',
+        ylab = 'Frequência (n)',
+        main = 'Gráfico 1 - Distribuição de diamantes por cor')
 ```
-
 
 
 ```{r, results='show'}
 # Cor - Quali
 # Corte - Quali
 ## Frequencia absoluta
-barplot(table(dados$cut), ylim = c(0,30000), col = rainbow(nrow(table(dados$cut))))
+barplot(table(dados$cut), 
+        ylim = c(0,30000), 
+        xlab = 'Tipos de cortes', 
+        ylab = 'Frequência (n)', 
+        main = 'Gráfico 2 - Distribuiçào de diamantes por cortes')
 round(prop.table(table(dados$cut)) * 100, 1)
 ```
 
 ```{r, results='show'}
-## Frequencia relativa
-# TBD
-
 # Preço - Quanti
 # Peso - Quanti
-hist(dados$price)
-boxplot(dados$price)
-car::qqPlot(dados$price)
+hist(dados$price, 
+     xlab = 'Preço',
+     ylab = 'Frequência (n)',
+     main = 'Gráfico 3 - Preço dos diamantes')
+boxplot(dados$price, 
+        xlab = 'Preço', 
+        ylab = 'Frequência (n)', 
+        main = 'Gráfico 4 - Boxplot da distribuição de preços')
+car::qqPlot(dados$price, 
+            ylab = 'Preço', 
+            main = 'Gráfico 5 - Gráfico QQPlot dos preços')
 ```
 
 ```{r, results='show'}
-#hist(dados$carat)
-boxplot(dados$carat)
-car::qqPlot(dados$carat)
+boxplot(dados$carat,
+        ylab = 'Peso',
+        main = 'Gráfico 6 - Distribuição de pesos dos diamantes')
+car::qqPlot(dados$carat, 
+            ylab = 'Peso', 
+            main = 'Gráfico 7 - Gráfico QQPlot dos pesos')
 ```
 
 Total: 53940 diamantes com cortes:
