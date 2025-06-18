@@ -30,7 +30,7 @@ source(paste0(project_root_path, "/install_load_packages.R"), encoding = encodin
 
 # 1. Carregamento dos dados
 #dados <- diamonds
-str(dados)
+#str(dados)
 # 2. Tratamento dos dados
 
 dados <- dados %>% 
