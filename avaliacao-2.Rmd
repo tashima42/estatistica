@@ -50,18 +50,18 @@ dados <- dados %>%
 
 O conjunto de dados *diamonds* é composto de 53940 diamantes, com informações relevantes sobre sua classificação e precificação. Essa análise foca nos dados de preço e como este dado é influenciado pelo peso, cor e corte do diamante.
 
-Para todas as análises, formulamos hipóteses e partindo destas hipóteses, selecionamos amostras para as testar e concluir se elas podem ser rejeitadas, ou aceitas.
-
+Para todas as análises, formulamos hipóteses e a partir destas, selecionamos amostras para as testar e concluir se podem ser rejeitadas, ou aceitas.
 
 Os dados de cor dos diamantes foram ajustados para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
 
-```{r, results='hide'}
+```{r, results='show'}
 head(dados)
 str(dados)
 summary(dados)
+summary(dados$carat)
 ```
 
-Os grupos de diamantes coloridos e incolores tem uma proporção similar (Gráfico 1), mas o grupo colorido é maior, constituindo 51.6% da amostra.
+Os grupos de diamantes coloridos e incolores tem uma proporção similar (Gráfico 1), mas o grupo colorido é maior, constituindo 51.6% da amostra (Tabela 1).
 
 ```{r, results='show'}
 color_table <- table(dados$color_adj)
@@ -81,7 +81,8 @@ barplot(table(dados$color_adj),
 ```
 
 
-Quando separados por corte, a categoria com mais ocorrências é a "Ideal", com 40% do total dos diamantes e a menos representada é a "Fair", com apenas 3% dos diamantes (Gráfico 2). 
+Quando separados por corte, a categoria com mais ocorrências é a "Ideal", com 40% do total dos diamantes e a menos representada é a "Fair", com apenas 3% dos diamantes (Gráfico 2 e Tabela 2). 
+
 ```{r, results='show'}
 barplot(table(dados$cut), 
         ylim = c(0,30000), 
@@ -98,7 +99,7 @@ knitr::kable(corte_freq,
 ```
 
 
-O desvio padrão de `r sd(dados$price)` no preço dos diamantes deste conjunto e o histograma no Gráfico 3 com uma assimetria à direita, mostra claramente que os preços variam muito, porém, a maior parte dos diamantes tem um valor mais próximo do limite inferior da escala de preços.
+O desvio padrão de `r format(sd(dados$price), nsmall = 2)` no preço dos diamantes deste conjunto e o histograma no Gráfico 3 com uma assimetria à direita, mostra claramente que os preços variam muito, porém, a maior parte dos diamantes tem um valor mais próximo do limite inferior da escala de preços.
 
 
 ```{r, results='show'}
@@ -110,7 +111,7 @@ hist(dados$price,
 
 A variabilidade dos preços também é observada pela quantidade de outliers no Gráfico 4. Por estes motivos, conclui-se que a mediana é uma medida mais adequada que média para realizar observações e testes com esta variável. 
 
-Para testar a hipótese de que os dados de preço seguem uma distribuição normal, utilizamos o teste de Anderson-Darling (Tabela X) e o Gráfico 5 e com base no p-valor muito abaixo do valor significativo e no qqplot, a hipótese de que os dados de preço seguem uma distribuição normal é rejeitada.
+Para testar a hipótese de que os dados de preço seguem uma distribuição normal, utilizamos o teste de Anderson-Darling e comparação de Quantis-Quantis (Gráfico 5). Os resultados nos mostraram que o nosso valor *p* está abaixo do nosso alfa de 0.05, assim como o gráfico de quantis demonstra que os valores não seguem uma distribuição normal.
 
 ```{r, results='show'}
 boxplot(dados$price, 
@@ -126,8 +127,13 @@ car::qqPlot(dados$price,
             main = 'Gráfico 5 - Gráfico QQPlot dos preços')
 ```
 
-A análise da distribuição do peso dos diamantes tem conclusões parecidas com a do preço, existem muitos outliers (Gráfico 6) e a distribuição não é normal (Tabela Y e Gráfico 7).
-
+A análise da distribuição do peso dos diamantes tem conclusões parecidas com a do preço, existem muitos outliers (Gráfico 6) e a distribuição não é normal (Teste de normalidade de Anderson-Darling e Gráfico 7). A grande maioria dos diamantes (75%) possui peso abaixo de 1.04:\
+\
+Q1: `r quantile(dados$carat, .25)`\
+Q2: `r quantile(dados$carat, .50)`\
+Q3: `r quantile(dados$carat, .75)`\
+Q4: `r quantile(dados$carat, 1)`\
+\
 ```{r, results='show'}
 boxplot(dados$carat,
         ylab = 'Peso',
