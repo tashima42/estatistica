@@ -55,17 +55,23 @@ Para todas as análises, formulamos hipóteses e partindo destas hipóteses, sel
 
 Os dados de cor dos diamantes foram ajustdos para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
 
-```{r, results='show'}
+```{r, results='hide'}
 head(dados)
-#str(dados)
-#summary(dados)
+str(dados)
+summary(dados)
 ```
 
 Os grupos de diamantes coloridos e incolores tem uma proporção similar (Gráfico 1), mas o grupo colorido é maior, constituindo 51.6% da amostra.
 
 ```{r, results='show'}
-table(dados$color_adj)
-round(prop.table(table(dados$color_adj)) * 100, 1)
+color_table <- table(dados$color_adj)
+color_freq <- round(prop.table(color_table) * 100, 1)
+
+knitr::kable(color_freq, 
+             caption = 'Tabela 1 - Cores', 
+             align = 'c',
+             col.names = c('Cores', 'Frequência (%)'))
+
 barplot(table(dados$color_adj), 
         ylim = c(0,30000), 
         col=c("lightblue", "white"),
@@ -82,7 +88,13 @@ barplot(table(dados$cut),
         xlab = 'Tipos de cortes', 
         ylab = 'Frequência (n)', 
         main = 'Gráfico 2 - Distribuiçào de diamantes por cortes')
-round(prop.table(table(dados$cut)) * 100, 1)
+
+
+corte_freq <- round(prop.table(table(dados$cut)) * 100, 1)
+knitr::kable(corte_freq, 
+             caption = 'Tabela 2 - Tipos de cortes', 
+             align = 'c',
+             col.names = c('Tipos de cortes', 'Frequência (%)'))
 ```
 
 
@@ -143,7 +155,7 @@ O teste da hipótese de que existe correlação entre o peso e o preço do diama
 plot(dados$price, dados$carat,
      xlab = "Preço",
      ylab = "Peso",
-     main = "Gráfico 8 - Gráfico de dispersão Preço X Peso")
+     main = "Gráfico 8 - Gráfico de dispersão Preço x Peso")
 ```
 
 ```{r}
@@ -153,18 +165,25 @@ plot(dados$price, dados$carat,
 
 ## H0: O preço não muda com o corte
 ## H1: O preço muda com o cortes
-
 sd(dados$price)
 
-boxplot(dados$price ~ dados$cut)
+boxplot(dados$price ~ dados$cut,
+        xlab = 'Tipo de corte',
+        ylab = 'Preço',
+        main = 'Tablea 9 - Tipo de corte x Preço')
 
-dados %>% 
+cut_price <- dados %>% 
   group_by(cut) %>% 
   summarise(
     quantidade = n(),
     preco_medio = round(mean(price), 0),
     preco_mediano = round(median(price), 0)
   )
+knitr::kable(cut_price,
+             caption = 'Tabela X - Médias e medianas do preço com base no corte',
+             col.names = c('Corte', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
+             align = 'c')
+
 
 dunn.test(dados$price, dados$cut, method = "bonferroni")
 ## Conclusão: p <= alpha/2, então hipótese nula é descartada. O preço varia com o corte.
@@ -174,16 +193,25 @@ dunn.test(dados$price, dados$cut, method = "bonferroni")
 ## H0: O preço não muda com as cores
 ## H1: O preço muda com as cores
 
-boxplot(dados$price ~ dados$color_adj)
+boxplot(dados$price ~ dados$color_adj,
+        xlab = 'Cor',
+        ylab = 'Preço',
+        main = 'Gráfico 10 - Cor x Preço')
+
 wilcox.test(price ~ color_adj, data = dados)
 
-dados %>% 
+color_price <- dados %>% 
   group_by(color_adj) %>% 
   summarise(
     quantidade = n(),
     preco_medio = round(mean(price), 0),
     preco_mediano = round(median(price), 0)
   )
+knitr::kable(color_price,
+             caption = 'Tabela X2 - Médias e medianas do preço com base no corte',
+             col.names = c('Cor', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
+             align = 'c')
+
 
 hist(dados$price[dados$color_adj == 'Incolor'], ylim = c(0, 8000))
 hist(dados$price[dados$color_adj == 'Colorido'], ylim = c(0, 8000))
