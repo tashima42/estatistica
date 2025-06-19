@@ -48,16 +48,20 @@ dados <- dados %>%
 
 ## Análise exploratória dos dados
 
-O conjunto de dados *diamonds* é composto pelo preço, peso, cor, corte e outras informações de 53940 diamantes.
+O conjunto de dados *diamonds* é composto de 53940 diamantes, com informações relevantes sobre sua classificação e precificação. Essa análise foca nos dados de preço e como este dado é influenciado pelo peso, cor e corte do diamante.
+
+Para todas as análises, formulamos hipóteses e partindo destas hipóteses, selecionamos amostras para as testar e concluir se elas podem ser rejeitadas, ou aceitas.
+
+
+Os dados de cor dos diamantes foram ajustdos para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
 
 ```{r, results='show'}
 head(dados)
-str(dados)
-summary(dados)
+#str(dados)
+#summary(dados)
 ```
 
-
-Diamantes com as cores "D", "E", "F", foram agrupados, como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos. Os dois grupos tem uma proporção similar, mas o grupo colorido é maior, sendo 51.6% da amostra.
+Os grupos de diamantes coloridos e incolores tem uma proporção similar (Gráfico 1), mas o grupo colorido é maior, constituindo 51.6% da amostra.
 
 ```{r, results='show'}
 table(dados$color_adj)
@@ -71,10 +75,8 @@ barplot(table(dados$color_adj),
 ```
 
 
+Quando separados por corte, a categoria com mais ocorrências é a "Ideal", com 40% do total dos diamantes e a menos representada é a "Fair", com apenas 3% dos diamantes (Gráfico 2). 
 ```{r, results='show'}
-# Cor - Quali
-# Corte - Quali
-## Frequencia absoluta
 barplot(table(dados$cut), 
         ylim = c(0,30000), 
         xlab = 'Tipos de cortes', 
@@ -83,52 +85,54 @@ barplot(table(dados$cut),
 round(prop.table(table(dados$cut)) * 100, 1)
 ```
 
+
+O desvio padrão de `r sd(dados$price)` no preço dos diamantes deste conjunto e o histograma no Gráfico 3 com uma assimetria à direita, mostra claramente que os preços variam muito, porém, a maior parte dos diamantes tem um valor mais próximo do limite inferior da escala de preços.
+
+
 ```{r, results='show'}
-# Preço - Quanti
-# Peso - Quanti
 hist(dados$price, 
      xlab = 'Preço',
      ylab = 'Frequência (n)',
      main = 'Gráfico 3 - Preço dos diamantes')
+```
+
+A variabilidade dos preços também é observada pela quantidade de outliers no Gráfico 4. Por estes motivos, conclui-se que a mediana é uma medida mais adequada que média para realizar observações e testes com esta variável. 
+
+Para testar a hipótese de que os dados de preço seguem uma distribuição normal, utilizamos o teste de Anderson-Darling (Tabela X) e o Gráfico 5 e com base no p-valor muito abaixo do valor significativo e no qqplot, a hipótese de que os dados de preço seguem uma distribuição normal é rejeitada.
+
+```{r, results='show'}
 boxplot(dados$price, 
         xlab = 'Preço', 
         ylab = 'Frequência (n)', 
         main = 'Gráfico 4 - Boxplot da distribuição de preços')
+
+# Tabela X
+ad.test(dados$price)
+
 car::qqPlot(dados$price, 
             ylab = 'Preço', 
             main = 'Gráfico 5 - Gráfico QQPlot dos preços')
 ```
 
+A análise da distribuição do peso dos diamantes tem conclusões parecidas com a do preço, existem muitos outliers (Gráfico 6) e a distribuição não é normal (Tabela Y e Gráfico 7).
+
 ```{r, results='show'}
 boxplot(dados$carat,
         ylab = 'Peso',
         main = 'Gráfico 6 - Distribuição de pesos dos diamantes')
+
+# Tabela Y
+ad.test(dados$carat)
+
 car::qqPlot(dados$carat, 
             ylab = 'Peso', 
             main = 'Gráfico 7 - Gráfico QQPlot dos pesos')
 ```
 
-Total: 53940 diamantes com cortes:
-
-1610 Fair
-
-4906 Good
-
-12082 Very Good
-
-13791 Premium
-
-21551 Ideal
-
-Cores:
-
-27826 Coloridos
-
-26114 Incolores
 
 ## Existe correlação entre o preço e o peso do diamante?
 
-Correlação: `r cor(dados$price, dados$carat, method = "spearman")`
+O teste da hipótese de que existe correlação entre o peso e o preço do diamante leva em consideração o desvio padrão e os outliers observados nos Gráficos 4 e 6, por isso utilizamos o coeficiente de correlação de Spearman, mais robusto a outliers. O coeficiente de correlção peso e preço é de `r cor(dados$price, dados$carat, method = "spearman")`, que, corroborado pelo Gráfico 8, mostra que a hipótese pode ser aceita e existe uma correlação significativa e positiva entre preço e peso do diamante.
 
 ```{r}
 # 1. existe correlação entre preço e peso do diamante?
@@ -136,13 +140,13 @@ Correlação: `r cor(dados$price, dados$carat, method = "spearman")`
 ## H1: O preço acompanha o peso.
 
 ## Alfa = 0.05
-plot(dados$price, dados$carat)
-sd(dados$carat)
-sd(dados$price)
+plot(dados$price, dados$carat,
+     xlab = "Preço",
+     ylab = "Peso",
+     main = "Gráfico 8 - Gráfico de dispersão Preço X Peso")
+```
 
-ad.test(dados$price)
-ad.test(dados$carat)
-
+```{r}
 ### H0 rejeitada, dados não são normais. Conclusão: Existe uma correlação positiva e significativa entre peso e preço.
 
 # 2. existe diferença no preço do diamante de acordo com o tipo de corte?
