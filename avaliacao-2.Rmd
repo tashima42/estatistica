@@ -30,7 +30,7 @@ source(paste0(project_root_path, "/install_load_packages.R"), encoding = encodin
 
 # 1. Carregamento dos dados
 dados <- diamonds
-str(dados)
+#str(dados)
 # 2. Tratamento dos dados
 
 dados <- dados %>% 
@@ -53,7 +53,7 @@ O conjunto de dados *diamonds* é composto de 53940 diamantes, com informações
 Para todas as análises, formulamos hipóteses e partindo destas hipóteses, selecionamos amostras para as testar e concluir se elas podem ser rejeitadas, ou aceitas.
 
 
-Os dados de cor dos diamantes foram ajustdos para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
+Os dados de cor dos diamantes foram ajustados para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
 
 ```{r, results='hide'}
 head(dados)
@@ -144,7 +144,7 @@ car::qqPlot(dados$carat,
 
 ## Existe correlação entre o preço e o peso do diamante?
 
-O teste da hipótese de que existe correlação entre o peso e o preço do diamante leva em consideração o desvio padrão e os outliers observados nos Gráficos 4 e 6, por isso utilizamos o coeficiente de correlação de Spearman, mais robusto a outliers. O coeficiente de correlção peso e preço é de `r cor(dados$price, dados$carat, method = "spearman")`, que, corroborado pelo Gráfico 8, mostra que a hipótese pode ser aceita e existe uma correlação significativa e positiva entre preço e peso do diamante.
+O teste da hipótese de que existe correlação entre o peso e o preço do diamante leva em consideração o desvio padrão e os outliers observados nos Gráficos 4 e 6, por isso utilizamos o coeficiente de correlação de Spearman, mais robusto a outliers. O coeficiente de correlação entre peso e preço é de `r cor(dados$price, dados$carat, method = "spearman")`, que, corroborado pelo Gráfico 8, mostra que a hipótese pode ser aceita e existe uma correlação significativa e positiva entre preço e peso do diamante.
 
 ```{r}
 # 1. existe correlação entre preço e peso do diamante?
@@ -157,6 +157,8 @@ plot(dados$price, dados$carat,
      ylab = "Peso",
      main = "Gráfico 8 - Gráfico de dispersão Preço x Peso")
 ```
+
+## Existe diferença no preço do diamante de acordo com o tipo de corte?
 
 ```{r}
 ### H0 rejeitada, dados não são normais. Conclusão: Existe uma correlação positiva e significativa entre peso e preço.
@@ -179,6 +181,7 @@ cut_price <- dados %>%
     preco_medio = round(mean(price), 0),
     preco_mediano = round(median(price), 0)
   )
+
 knitr::kable(cut_price,
              caption = 'Tabela X - Médias e medianas do preço com base no corte',
              col.names = c('Corte', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
@@ -187,6 +190,14 @@ knitr::kable(cut_price,
 
 dunn.test(dados$price, dados$cut, method = "bonferroni")
 ## Conclusão: p <= alpha/2, então hipótese nula é descartada. O preço varia com o corte.
+
+```
+
+O teste Kruskal-Wallis deu um valor de p <= alpha/2, então hipótese nula é descartada. Desta forma, o preço vaira de acordo com o corte. Além disso, o Dunn Teste demonstra quais grupos são diferentes entre si.
+
+## Existe diferença no preço dos diamantes coloridos e incolores?
+
+```{r}
 
 # 3. existe diferença no preço dos diamantes coloridos e incolores?
 
@@ -198,7 +209,6 @@ boxplot(dados$price ~ dados$color_adj,
         ylab = 'Preço',
         main = 'Gráfico 10 - Cor x Preço')
 
-wilcox.test(price ~ color_adj, data = dados)
 
 color_price <- dados %>% 
   group_by(color_adj) %>% 
@@ -212,9 +222,25 @@ knitr::kable(color_price,
              col.names = c('Cor', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
              align = 'c')
 
-
-hist(dados$price[dados$color_adj == 'Incolor'], ylim = c(0, 8000))
-hist(dados$price[dados$color_adj == 'Colorido'], ylim = c(0, 8000))
-
-## H0: descartada, o preço varia com a cor. Diamantes coloridos tendem a ter um preço médio e mediano maior que os incolores, porém os incolores tem uma quantidade considerável de outliers com preços elevados.
 ```
+
+Analisando o Gráfico 10, observa-se que a mediana do preço dos diamantes Incolores (`r dados %>% filter(color_adj == "Incolor") %>% pull(price) %>% median() %>% round(0)`) é menor que a mediana do preço dos diamantes Coloridos (`r dados %>% filter(color_adj == "Colorido") %>% pull(price) %>% median() %>% round(0)`).
+
+```{r}
+
+wilcox.test(price ~ color_adj, data = dados)
+
+
+hist(dados$price[dados$color_adj == 'Incolor'], ylim = c(0, 8000),
+        xlab = 'Incolor',
+        ylab = 'Frequência',
+        main = 'Gráfico 11 - Histograma de preço (Incolor)')
+
+hist(dados$price[dados$color_adj == 'Colorido'], ylim = c(0, 8000),
+        xlab = 'Colorido',
+        ylab = 'Frequência',
+        main = 'Gráfico 12 - Histograma de preço (Colorido)')
+
+```
+
+H0: Descartada, o preço varia com a cor. Diamantes coloridos tendem a ter um preço médio e mediano maior que os incolores, porém os incolores tem uma quantidade considerável de outliers com preços elevados.
