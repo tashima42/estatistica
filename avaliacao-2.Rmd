@@ -3,11 +3,13 @@ title: "Grupo 6"
 author: "Thiago Cezario, Pedro Henrique Mateus Tashima, Ricardo Jonas de Assis"
 date: "2025-06-10"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.align='center')
+knitr::opts_chunk$set(out.width = 800)
 ```
 
 ```{r, results='hide', message=FALSE}
@@ -46,23 +48,25 @@ dados <- dados %>%
 
 ```
 
-## Análise exploratória dos dados
+### Análise exploratória dos dados
 
-O conjunto de dados *diamonds* é composto de 53940 diamantes, com informações relevantes sobre sua classificação e precificação. Essa análise foca nos dados de preço e como este dado é influenciado pelo peso, cor e corte do diamante.
+O conjunto de dados *diamonds* é composto de 53940 diamantes, com informações relevantes sobre sua classificação e precificação. Essa análise foca nos dados de preço (U$) e como este dado é influenciado pelo peso (ct), cor e corte do diamante.
 
 Para todas as análises, formulamos hipóteses e a partir destas, selecionamos amostras para as testar e concluir se podem ser rejeitadas, ou aceitas.
 
-Os dados de cor dos diamantes foram ajustados para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
-
+Os dados de cor dos diamantes seguem o padrão da escala GIA, porém para simplificar as análises a seguir elas foram ajustadas seguindo o seguinte padrão: diamantes com as cores "D", "E", "F", foram agrupados como incolores enquanto os diamantes com cores "G", "H", "I" e "J", como coloridos.
+\
+\
 ```{r, results='hide'}
 head(dados)
 str(dados)
 summary(dados)
 summary(dados$carat)
 ```
-
+\
 Os grupos de diamantes coloridos e incolores tem uma proporção similar (Gráfico 1), mas o grupo colorido é maior, constituindo 51.6% da amostra (Tabela 1).
-
+\
+\
 ```{r, results='show'}
 color_table <- table(dados$color_adj)
 color_freq <- round(prop.table(color_table) * 100, 1)
@@ -80,9 +84,10 @@ barplot(table(dados$color_adj),
         main = 'Gráfico 1 - Distribuição de diamantes por cor')
 ```
 
-
+\
 Quando separados por corte, a categoria com mais ocorrências é a "Ideal", com 40% do total dos diamantes e a menos representada é a "Fair", com apenas 3% dos diamantes (Gráfico 2 e Tabela 2). 
-
+\
+\
 ```{r, results='show'}
 barplot(table(dados$cut), 
         ylim = c(0,30000), 
@@ -98,9 +103,10 @@ knitr::kable(corte_freq,
              col.names = c('Tipos de cortes', 'Frequência (%)'))
 ```
 
-
+\
 O desvio padrão de `r format(sd(dados$price), nsmall = 2)` no preço dos diamantes deste conjunto e o histograma no Gráfico 3 com uma assimetria à direita, mostra claramente que os preços variam muito, porém, a maior parte dos diamantes tem um valor mais próximo do limite inferior da escala de preços.
-
+\
+\
 
 ```{r, results='show'}
 hist(dados$price, 
@@ -108,11 +114,12 @@ hist(dados$price,
      ylab = 'Frequência (n)',
      main = 'Gráfico 3 - Preço dos diamantes')
 ```
-
+\
 A variabilidade dos preços também é observada pela quantidade de outliers no Gráfico 4. Por estes motivos, conclui-se que a mediana é uma medida mais adequada que média para realizar observações e testes com esta variável. 
 
 Para testar a hipótese de que os dados de preço seguem uma distribuição normal, utilizamos o teste de Anderson-Darling e comparação de Quantis-Quantis (Gráfico 5). Os resultados nos mostraram que o nosso valor *p* está abaixo do nosso alfa de 0.05, assim como o gráfico de quantis demonstra que os valores não seguem uma distribuição normal.
-
+\
+\
 ```{r, results='show'}
 boxplot(dados$price,
         ylab = 'Preço (U$)', 
@@ -125,13 +132,14 @@ car::qqPlot(dados$price,
             ylab = 'Preço (U$)', 
             main = 'Gráfico 5 - Gráfico QQPlot dos preços')
 ```
-
-A análise da distribuição do peso dos diamantes tem conclusões parecidas com a do preço, existem muitos outliers (Gráfico 6) e a distribuição não é normal (Teste de normalidade de Anderson-Darling e Gráfico 7). A grande maioria dos diamantes (75%) possui peso abaixo de 1.04:\
 \
-Q1: `r quantile(dados$carat, .25)`\
-Q2: `r quantile(dados$carat, .50)`\
-Q3: `r quantile(dados$carat, .75)`\
-Q4: `r quantile(dados$carat, 1)`\
+A análise da distribuição do peso dos diamantes tem conclusões parecidas com a do preço, existem muitos outliers (Gráfico 6) e a distribuição não é normal (Teste de normalidade de Anderson-Darling e Gráfico 7). A grande maioria dos diamantes (75%) possui peso abaixo de 1.04 quilates:\
+\
+Q1: `r quantile(dados$carat, .25)` ct\
+Q2: `r quantile(dados$carat, .50)` ct\
+Q3: `r quantile(dados$carat, .75)` ct\
+Q4: `r quantile(dados$carat, 1)` ct\
+\
 \
 ```{r, results='show'}
 boxplot(dados$carat,
@@ -140,17 +148,19 @@ boxplot(dados$carat,
 
 # Tabela Y
 ad.test(dados$carat)
-
+```
+```{r, results='hide'}
 car::qqPlot(dados$carat, 
             ylab = 'Peso (ct)', 
             main = 'Gráfico 7 - Gráfico QQPlot dos pesos')
 ```
-
+\
 
 ### 1. Existe correlação entre o preço e o peso do diamante?
 
 O teste da hipótese de que existe correlação entre o peso e o preço do diamante leva em consideração o desvio padrão e os outliers observados nos Gráficos 4 e 6, por isso utilizamos o coeficiente de correlação de Spearman, mais robusto a outliers. O coeficiente de correlação entre peso e preço é de `r cor(dados$price, dados$carat, method = "spearman")`, que, corroborado pelo Gráfico 8, mostra que a hipótese pode ser aceita e existe uma correlação significativa e positiva entre preço e peso do diamante.
-
+\
+\
 ```{r}
 # 1. existe correlação entre preço e peso do diamante?
 ## H0: Preço não acompanha o peso
@@ -162,11 +172,13 @@ plot(dados$price, dados$carat,
      ylab = "Peso (ct)",
      main = "Gráfico 8 - Gráfico de dispersão Preço x Peso")
 ```
+\
 
 ### 2. Existe diferença no preço do diamante de acordo com o tipo de corte?
 
 A primeira hipótese para essa pergunta é a de que o preço se mantém o mesmo para os diferentes grupos referentes ao corte. Com um boxplot entre preço e tipo de corte (Gráfico 9) nós vemos que a distribuição entre os grupos é muito similar, com exceção dos diamantes com corte *Ideal*, que possuem uma média e mediana consideravelmente abaixo dos outros grupos, o que é confirmado através da Tabela 3.
-
+\
+\
 
 ```{r}
 ### H0 rejeitada, dados não são normais. Conclusão: Existe uma correlação positiva e significativa entre peso e preço.
@@ -199,13 +211,17 @@ dunn.test(dados$price, dados$cut, method = "bonferroni")
 ## Conclusão: p <= alpha/2, então hipótese nula é descartada. O preço varia com o corte.
 
 ```
-
+\
 Através do teste de Kruskal-Wallis nós comparamos a relação entre o preço dos diversos tipos de cortes, e o resultado nos mostra que, com exceção dos diamantes com corte *Ideal*, todos os outros cortes não possuem uma diferença significativa no preço. Isso nos leva a descartar a hipótese de que o preço dos diamantes se mantém igual independente do corte.
+\
+\
+
 
 ### 3. Existe diferença no preço dos diamantes coloridos e incolores?
 
 Para responder essa pergunta primeiramente precisamos comparar os dois grupos (Gráfico 10 e Tabela 4). A comparação nos mostra que ambos grupos possuem uma quantidade semelhante de diamantes, porém podemos notar que apesar de ambos os grupos possuirem bastante outliers e diamantes com valores altos (Gráfico 10), o grupo de diamantes coloridos possui tanto um preço médio como um mediano significativamente maior que o grupo de diamantes incolores (Tabela 4). 
-
+\
+\
 ```{r}
 
 # 3. existe diferença no preço dos diamantes coloridos e incolores?
@@ -233,9 +249,10 @@ knitr::kable(color_price,
 
 wilcox.test(price ~ color_adj, data = dados)
 ```
-
+\
 Se compararmos a distribuição dos preços em cada grupo através de histogramas (Gráficos 11 e 12), podemos ver que a distribuição nos 2 grupos é bastante semelhante, com ambos possuindo diamantes com preço mínimo e máximo semelhantes, porém o grupo de coloridos possui um número maior de exemplares com preços mais altos do que os incolores.
-
+\
+\
 ```{r}
 par(mfrow = c(1,2))
 hist(dados$price[dados$color_adj == 'Incolor'], 
