@@ -1,10 +1,10 @@
 ---
 title: "Grupo 6"
-author: "Thiago Cezario, 
-Pedro Henrique Mateus Tashima,
-Ricardo Jonas de Assis"
+author: "Thiago Cezario, Pedro Henrique Mateus Tashima, Ricardo Jonas de Assis"
 date: "2025-06-10"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -54,7 +54,7 @@ Para todas as análises, formulamos hipóteses e a partir destas, selecionamos a
 
 Os dados de cor dos diamantes foram ajustados para as análises, diamantes com as cores "D", "E", "F", foram agrupados como incolores e os diamantes com cores "G", "H", "I" e "J", como coloridos.
 
-```{r, results='show'}
+```{r, results='hide'}
 head(dados)
 str(dados)
 summary(dados)
@@ -104,7 +104,7 @@ O desvio padrão de `r format(sd(dados$price), nsmall = 2)` no preço dos diaman
 
 ```{r, results='show'}
 hist(dados$price, 
-     xlab = 'Preço',
+     xlab = 'Preço (U$)',
      ylab = 'Frequência (n)',
      main = 'Gráfico 3 - Preço dos diamantes')
 ```
@@ -114,16 +114,15 @@ A variabilidade dos preços também é observada pela quantidade de outliers no 
 Para testar a hipótese de que os dados de preço seguem uma distribuição normal, utilizamos o teste de Anderson-Darling e comparação de Quantis-Quantis (Gráfico 5). Os resultados nos mostraram que o nosso valor *p* está abaixo do nosso alfa de 0.05, assim como o gráfico de quantis demonstra que os valores não seguem uma distribuição normal.
 
 ```{r, results='show'}
-boxplot(dados$price, 
-        xlab = 'Preço', 
-        ylab = 'Frequência (n)', 
+boxplot(dados$price,
+        ylab = 'Preço (U$)', 
         main = 'Gráfico 4 - Boxplot da distribuição de preços')
 
 # Tabela X
 ad.test(dados$price)
 
 car::qqPlot(dados$price, 
-            ylab = 'Preço', 
+            ylab = 'Preço (U$)', 
             main = 'Gráfico 5 - Gráfico QQPlot dos preços')
 ```
 
@@ -136,19 +135,19 @@ Q4: `r quantile(dados$carat, 1)`\
 \
 ```{r, results='show'}
 boxplot(dados$carat,
-        ylab = 'Peso',
+        ylab = 'Peso (ct)',
         main = 'Gráfico 6 - Distribuição de pesos dos diamantes')
 
 # Tabela Y
 ad.test(dados$carat)
 
 car::qqPlot(dados$carat, 
-            ylab = 'Peso', 
+            ylab = 'Peso (ct)', 
             main = 'Gráfico 7 - Gráfico QQPlot dos pesos')
 ```
 
 
-## Existe correlação entre o preço e o peso do diamante?
+### 1. Existe correlação entre o preço e o peso do diamante?
 
 O teste da hipótese de que existe correlação entre o peso e o preço do diamante leva em consideração o desvio padrão e os outliers observados nos Gráficos 4 e 6, por isso utilizamos o coeficiente de correlação de Spearman, mais robusto a outliers. O coeficiente de correlação entre peso e preço é de `r cor(dados$price, dados$carat, method = "spearman")`, que, corroborado pelo Gráfico 8, mostra que a hipótese pode ser aceita e existe uma correlação significativa e positiva entre preço e peso do diamante.
 
@@ -159,12 +158,15 @@ O teste da hipótese de que existe correlação entre o peso e o preço do diama
 
 ## Alfa = 0.05
 plot(dados$price, dados$carat,
-     xlab = "Preço",
-     ylab = "Peso",
+     xlab = "Preço (U$)",
+     ylab = "Peso (ct)",
      main = "Gráfico 8 - Gráfico de dispersão Preço x Peso")
 ```
 
-## Existe diferença no preço do diamante de acordo com o tipo de corte?
+### 2. Existe diferença no preço do diamante de acordo com o tipo de corte?
+
+A primeira hipótese para essa pergunta é a de que o preço se mantém o mesmo para os diferentes grupos referentes ao corte. Com um boxplot entre preço e tipo de corte (Gráfico 9) nós vemos que a distribuição entre os grupos é muito similar, com exceção dos diamantes com corte *Ideal*, que possuem uma média e mediana consideravelmente abaixo dos outros grupos, o que é confirmado através da Tabela 3.
+
 
 ```{r}
 ### H0 rejeitada, dados não são normais. Conclusão: Existe uma correlação positiva e significativa entre peso e preço.
@@ -173,12 +175,11 @@ plot(dados$price, dados$carat,
 
 ## H0: O preço não muda com o corte
 ## H1: O preço muda com o cortes
-sd(dados$price)
 
 boxplot(dados$price ~ dados$cut,
         xlab = 'Tipo de corte',
-        ylab = 'Preço',
-        main = 'Tablea 9 - Tipo de corte x Preço')
+        ylab = 'Preço (U$)',
+        main = 'Gráfico 9 - Tipo de corte x Preço')
 
 cut_price <- dados %>% 
   group_by(cut) %>% 
@@ -189,7 +190,7 @@ cut_price <- dados %>%
   )
 
 knitr::kable(cut_price,
-             caption = 'Tabela X - Médias e medianas do preço com base no corte',
+             caption = 'Tabela 3 - Médias e medianas do preço (U$) com base no corte',
              col.names = c('Corte', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
              align = 'c')
 
@@ -199,9 +200,11 @@ dunn.test(dados$price, dados$cut, method = "bonferroni")
 
 ```
 
-O teste Kruskal-Wallis deu um valor de p <= alpha/2, então hipótese nula é descartada. Desta forma, o preço vaira de acordo com o corte. Além disso, o Dunn Teste demonstra quais grupos são diferentes entre si.
+Através do teste de Kruskal-Wallis nós comparamos a relação entre o preço dos diversos tipos de cortes, e o resultado nos mostra que, com exceção dos diamantes com corte *Ideal*, todos os outros cortes não possuem uma diferença significativa no preço. Isso nos leva a descartar a hipótese de que o preço dos diamantes se mantém igual independente do corte.
 
-## Existe diferença no preço dos diamantes coloridos e incolores?
+### 3. Existe diferença no preço dos diamantes coloridos e incolores?
+
+Para responder essa pergunta primeiramente precisamos comparar os dois grupos (Gráfico 10 e Tabela 4). A comparação nos mostra que ambos grupos possuem uma quantidade semelhante de diamantes, porém podemos notar que apesar de ambos os grupos possuirem bastante outliers e diamantes com valores altos (Gráfico 10), o grupo de diamantes coloridos possui tanto um preço médio como um mediano significativamente maior que o grupo de diamantes incolores (Tabela 4). 
 
 ```{r}
 
@@ -212,7 +215,7 @@ O teste Kruskal-Wallis deu um valor de p <= alpha/2, então hipótese nula é de
 
 boxplot(dados$price ~ dados$color_adj,
         xlab = 'Cor',
-        ylab = 'Preço',
+        ylab = 'Preço (U$)',
         main = 'Gráfico 10 - Cor x Preço')
 
 
@@ -224,29 +227,29 @@ color_price <- dados %>%
     preco_mediano = round(median(price), 0)
   )
 knitr::kable(color_price,
-             caption = 'Tabela X2 - Médias e medianas do preço com base no corte',
+             caption = 'Tabela 4 - Médias e medianas do preço (U$) com base no corte',
              col.names = c('Cor', 'Quantidade', 'Preço Médio', 'Preço Mediano'),
              align = 'c')
 
+wilcox.test(price ~ color_adj, data = dados)
 ```
 
-Analisando o Gráfico 10, observa-se que a mediana do preço dos diamantes Incolores (`r dados %>% filter(color_adj == "Incolor") %>% pull(price) %>% median() %>% round(0)`) é menor que a mediana do preço dos diamantes Coloridos (`r dados %>% filter(color_adj == "Colorido") %>% pull(price) %>% median() %>% round(0)`).
+Se compararmos a distribuição dos preços em cada grupo através de histogramas (Gráficos 11 e 12), podemos ver que a distribuição nos 2 grupos é bastante semelhante, com ambos possuindo diamantes com preço mínimo e máximo semelhantes, porém o grupo de coloridos possui um número maior de exemplares com preços mais altos do que os incolores.
 
 ```{r}
+par(mfrow = c(1,2))
+hist(dados$price[dados$color_adj == 'Incolor'], 
+     xlim = c(0, 20000),
+     ylim = c(0, 8000), 
+     xlab = 'Preço (U$)',
+     ylab = 'Frequência (n)',
+     main = 'Gráfico 11 - Preço (Incolor)')
 
-wilcox.test(price ~ color_adj, data = dados)
-
-
-hist(dados$price[dados$color_adj == 'Incolor'], ylim = c(0, 8000),
-        xlab = 'Incolor',
-        ylab = 'Frequência',
-        main = 'Gráfico 11 - Histograma de preço (Incolor)')
-
-hist(dados$price[dados$color_adj == 'Colorido'], ylim = c(0, 8000),
-        xlab = 'Colorido',
-        ylab = 'Frequência',
-        main = 'Gráfico 12 - Histograma de preço (Colorido)')
+hist(dados$price[dados$color_adj == 'Colorido'], 
+     xlim = c(0, 20000),
+     ylim = c(0, 8000),
+     xlab = 'Preço (U$)',
+     ylab = 'Frequência (n)',
+     main = 'Gráfico 12 - Preço (Colorido)')
 
 ```
-
-H0: Descartada, o preço varia com a cor. Diamantes coloridos tendem a ter um preço médio e mediano maior que os incolores, porém os incolores tem uma quantidade considerável de outliers com preços elevados.
